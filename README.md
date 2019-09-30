@@ -21,7 +21,7 @@ This test app contains
 # How to Run
   1. To start the server run the included pre-build jar package : priceService-0.0.1-SNAPSHOT-jar-with-dependencies.jar
   in windows CMD prompt
-  # $> java -cp .\priceService-0.0.1-SNAPSHOT-jar-with-dependencies.jar priceApp.priceApp
+    - $> java -cp .\priceService-0.0.1-SNAPSHOT-jar-with-dependencies.jar priceApp.priceApp
       
   2. Launch the priceAp p.html in browser.
   
