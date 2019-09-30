@@ -1,0 +1,170 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Test app to view historical prices</title>
+    <script src="https://www.chartjs.org/dist/2.8.0/Chart.min.js"></script>
+    <script src="https://www.chartjs.org/samples/latest/utils.js"></script>
+</head>
+
+<body>
+    <h1>Price Chart</h1>
+    <div style="width:100% ; overflow: hidden;">
+        <div style="width: 15%; float: left;">
+            Symbol <input type="text" id="symbol" value="SPY">
+        </div>
+        <div style="width: 15%; float: left;">
+            Start Date <input type="date" id="startdate">
+        </div>
+        <div style="width: 15%; float: left;">
+            End Date <input type="date" id="enddate">
+        </div>
+    </div>
+    <div style="width: 100%; overflow: hidden;">
+        <br>Indicators<br>
+        <div style="width: 5%; float: left;">
+            <input type="checkbox" id="open"> Open
+        </div>
+        <div style="width: 5%; float: left;">
+            <input type="checkbox" id="close" value="1" checked> Close
+        </div>
+        <div style="width: 5%; float: left;">
+            <input type="checkbox" id="high"> High
+        </div>
+        <div style="width: 15%; float: left;"> 
+            <input type="checkbox" id="low"> Low
+        </div>
+        <div style="width: 5%; float: left;"> 
+            <button id="getData" onclick="getData()">Get Data</button>
+        </div>
+    </div>
+    <br><br>
+    <div style="width:80% ; overflow: hidden;">
+        <canvas id="myChart"></canvas>
+    </div>
+    
+
+    <script>
+        function BuildChart(labels, dataSets) {
+            var data = {
+                labels: labels,
+                datasets: dataSets,
+            };
+
+            var ctx = document.getElementById("myChart").getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    title: {
+                        display: false,
+                        text: 'View historical prices'
+                    },
+                    tooltips: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    hover: {
+                        mode: 'nearest',
+                        intersect: true
+                    },
+                    scales: {
+                        xAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Date (DDMMYYYY)'
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Price (USD)'
+                            }
+                        }]
+                    },
+                }
+            });
+
+            return myChart;
+        }
+
+        function getData() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var json = JSON.parse(this.response);
+
+                //map json result-set date to labels
+                var labels = json.data.map(function (e) {
+                    return e.date;
+                });
+
+                //map json result-set close price to labels
+                var openValues = json.data.map(function (e) {
+                    return e.open;
+                });
+                var closeValues = json.data.map(function (e) {
+                    return e.close;
+                });
+                var highValues = json.data.map(function (e) {
+                    return e.high;
+                });
+                var lowValues = json.data.map(function (e) {
+                    return e.low;
+                });
+
+                var datasets = [];
+                if(document.getElementById("open").checked){
+                    datasets.push({
+                        label: "Opening prices",
+                        data: openValues,
+                        backgroundColor: window.chartColors.red,
+                        borderColor: window.chartColors.red,
+                        fill: false,
+                    });
+                }
+                if(document.getElementById("close").checked){
+                    datasets.push({
+                        label: "Closing prices",
+                        data: closeValues,
+                        backgroundColor: window.chartColors.blue,
+                        borderColor: window.chartColors.blue,
+                        fill: false,
+                    });
+                }
+                if(document.getElementById("high").checked){
+                    datasets.push({
+                        label: "Daily High prices",
+                        data: highValues,
+                        backgroundColor: window.chartColors.green,
+                        borderColor: window.chartColors.green,
+                        fill: false,
+                    });
+                }
+                if(document.getElementById("low").checked){
+                    datasets.push({
+                        label: "Daily Low prices",
+                        data: lowValues,
+                        backgroundColor: window.chartColors.orange,
+                        borderColor: window.chartColors.orange,
+                        fill: false,
+                    });
+                }
+
+                BuildChart(labels, datasets);
+            }
+            };
+
+            var symbol = document.getElementById("symbol").value;
+            var startdate = document.getElementById("startdate").value.replace(/-/g,'');
+            var enddate = document.getElementById("enddate").value.replace(/-/g,'');
+            xhttp.open("GET", `http://localhost:4567/priceService/${symbol}/${startdate}/${enddate}`, false);
+            xhttp.send();
+        }
+    </script>
+</body>
+
+</html>
