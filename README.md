@@ -10,10 +10,12 @@ This test app contains
   - Input : Symbol, StartDate and EndDate
   - PriceIndicators to select - Open, Close, High, Low
   - Output : Line Charts for each indicator from JSON data 
+  Used Chart.js library for charting in HTML/JS
 
 # PriceApp - backend REST service
   - REST api : /priceService/:symbol/:startDate/:endDate
   - Output : JSON dataset for given date range price indicators for the symbol
+  Used sparkJava microframework for simple REST api functionality
   
   
 # How to Run
